@@ -9,6 +9,30 @@ abstract class REST extends CI_Controller {
     $this->load->library('session');
   }
 
+  public function login_conflict_check() {
+    $user = $this->session->userdata('user');
+    if (!empty($user)) {
+       $this->error(409, 'Current user has been logged in');
+       exit();
+    }
+  }
+
+  public function logout_conflict_check() {
+    $user = $this->session->userdata('user');
+    if (empty($user)) {
+      $this->error(409, 'Current user not logged in');
+      exit();
+    }
+  }
+
+  public function required_login() {
+    $user = $this->session->userdata('user');
+    if (empty($user)) {
+      $this->error(401, 'You should login first');
+      exit();
+    }
+  }
+
   public function json($data) {
     $this->output
       ->set_status_header(200)
@@ -17,9 +41,8 @@ abstract class REST extends CI_Controller {
   }
 
   public function error($status, $message) {
-    $this->output
-      ->set_status_header($status)
-      ->set_output($message);
+    $this->output->set_status_header($status);
+    echo $message;
   }
 
   public function _remap($method, $params = array()) {
