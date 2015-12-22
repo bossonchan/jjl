@@ -13,7 +13,7 @@ class Hoods_model extends CI_Model {
     if ($count < 0) {
       $this->db->limit($total);
     } else {
-      $this->db->limit($offset + $count, $offset);
+      $this->db->limit($count, $offset);
     }
     $this->db->order_by('h_name', 'ASC');
 
@@ -36,7 +36,7 @@ class Hoods_model extends CI_Model {
     if ($count < 0) {
       $this->db->limit($total);
     } else {
-      $this->db->limit($offset + $count, $offset);
+      $this->db->limit($count, $offset);
     }
     $this->db->order_by('b_name', 'ASC');
 
