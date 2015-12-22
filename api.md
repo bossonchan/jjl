@@ -565,7 +565,7 @@ GET /friend_request
 
 ### Accept/Delete friend request
 
-PUT /fiend_request/`:uid`
+PUT /friend_request/`:uid`
 
 **params**
 
