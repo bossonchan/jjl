@@ -4,7 +4,7 @@
 
 How to request APIs and get data/error correctly:
 ```javascript
-var baseUrl = "http://example.com/index.php/"; // remember to include 'index.php/'
+var baseUrl = "http://example.com/index.php"; // remember to include '/index.php'
 $.ajax({
   "type"    : "POST",
   "url"     : baseUrl + "/users",
@@ -570,6 +570,7 @@ PUT /fiend_request/`:uid`
 **params**
 
 - uid
+- action - enum(accpet, reject)
 
 **status**
 
