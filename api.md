@@ -4,10 +4,10 @@
 
 How to request APIs and get data/error correctly:
 ```javascript
-var baseUrl = "http://example.com";
+var baseUrl = "http://example.com/index.php/"; // remember to include 'index.php/'
 $.ajax({
   "type"    : "POST",
-  "url"     : baseUrl + "/index.php/users",
+  "url"     : baseUrl + "/users",
   "dataType": "json",
   "data": {
     "u_name": "xxx",
@@ -26,7 +26,7 @@ $.ajax({
 
 ### Login
 
-POST /index.php/session
+POST /session
 
 **params**
 
@@ -53,7 +53,7 @@ POST /index.php/session
 
 ### Logout
 
-DELETE /index.php/session
+DELETE /session
 
 **status**
 
@@ -77,7 +77,7 @@ DELETE /index.php/session
 
 ### Register
 
-POST /index.php/users
+POST /users
 
 **params**
 
@@ -110,7 +110,7 @@ POST /index.php/users
 
 ### Get user info by id
 
-GET /index.php/users/`:uid`
+GET /users/`:uid`
 
 **params**
 
@@ -136,7 +136,7 @@ GET /index.php/users/`:uid`
 
 ### Get current user info (use this API to check if current user is logged in)
 
-GET /index.php/users/me
+GET /users/me
 
 **status**
 
@@ -160,7 +160,7 @@ GET /index.php/users/me
 
 ### Get hood list
 
-GET /index.php/hoods?`offset`=0&`count`=10&`sort`=-1
+GET /hoods?`offset`=0&`count`=10&`sort`=-1
 
 **params**
 
@@ -227,7 +227,7 @@ GET /hoods/`:hood_id`/blocks?`offset`=0&`count`=10
 
 ### Join block
 
-POST /blocks/`:block_id`
+POST /blocks/`:block_id`/apply
 
 **params**
 
@@ -565,7 +565,7 @@ GET /friend_request
 
 ### Accept/Delete friend request
 
-POST /fiend_request/`:uid`/handle
+PUT /fiend_request/`:uid`
 
 **params**
 
