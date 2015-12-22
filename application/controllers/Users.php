@@ -14,8 +14,8 @@ class Users extends REST {
   public function post_session()  {
     $this->login_conflict_check();
 
-    $username = $this->input->post('u_name');
-    $password = $this->input->post('password');
+    $username = $this->input->post('u_name', true);
+    $password = $this->input->post('password', true);
 
     if (empty($username) or empty($password)) {
       return $this->error(400, 'username or password is empty.');
@@ -52,13 +52,13 @@ class Users extends REST {
 
   public function post_users() {
     $data = array(
-      'u_name'    => $this->input->post('u_name'),
-      'password'  => $this->input->post('password'),
-      'block_id'  => $this->input->post('block_id'),
-      'u_gender'  => !empty($this->input->post('u_gender'))  ? $this->input->post('u_gender')  : 'm',
-      'u_profile' => !empty($this->input->post('u_profile')) ? $this->input->post('u_profile') : '',
-      'u_photo'   => !empty($this->input->post('u_photo'))   ? $this->input->post('u_photo')   : '/publc/avatars/default.png',
-      'address'   => !empty($this->input->post('address'))   ? $this->input->post('address')   : ''
+      'u_name'    => $this->input->post('u_name', true),
+      'password'  => $this->input->post('password', true),
+      'block_id'  => $this->input->post('block_id', true),
+      'u_gender'  => !empty($this->input->post('u_gender' , true))  ? $this->input->post('u_gender', true)  : 'm',
+      'u_profile' => !empty($this->input->post('u_profile', true))  ? $this->input->post('u_profile', true) : '',
+      'u_photo'   => !empty($this->input->post('u_photo'  , true))  ? $this->input->post('u_photo', true)   : '/publc/avatars/default.png',
+      'address'   => !empty($this->input->post('address'  , true))  ? $this->input->post('address', true)   : ''
     );
 
     if (empty($data['u_name']) || $data['u_name'] > 20) {
@@ -109,30 +109,73 @@ class Users extends REST {
 
     $current = $this->session->user;
 
-    $count = intval($this->input->get('count'));
-    $offset= intval($this->input->get('offset'));
+    $count = intval($this->input->get('count', true));
+    $offset= intval($this->input->get('offset', true));
 
     $count  = empty($count)  ? 10 : $count;
     $offset = empty($offset) ? 0  : $offset;
+
+    if (is_nan($count) || is_nan($offset)) {
+      return $this->error(400, 'Invalid offset or count.');
+    }
 
     $result = $this->users_model->get_friend_list($current['uid'], $count, $offset);
     $this->json($result);
   }
 
   public function delete_friend($uid) {
-    echo 'delete friend';
+    $this->required_login();
+    $current = $this->session->user;
+    $this->users_model->remove_friends($current['uid'], $uid);
+    $this->json((object)null);
   }
 
   public function get_friend_request() {
-    echo 'get friend requests';
+    $this->required_login();
+
+    $count = intval($this->input->get('count', true));
+    $offset= intval($this->input->get('offset', true));
+
+    $count  = empty($count)  ? 10 : $count;
+    $offset = empty($offset) ? 0  : $offset;
+
+    if (is_nan($count) || is_nan($offset)) {
+      return $this->error(400, 'Invalid offset or count.');
+    }
+
+    $current = $this->session->user;
+    $result = $this->users_model->get_friend_requests($current['uid'], $count, $offset);
+    $this->json($result);
   }
 
   public function post_friend_request() {
-    echo 'send friend request to someone via u_name';
+    $this->required_login();
+    $username = $this->input->post('u_name', true);
+    if (empty($username)) {
+      return $this->error(400, 'Empty u_name');
+    }
+    $current = $this->session->user;
+    $result = $this->users_model->send_friend_request($current['uid'], $username);
+    if (!empty($result['error'])) {
+      $this->error(400, $result['error']);
+    } else {
+      $this->json($result['user']);
+    }
   }
 
   public function put_friend_request($uid) {
-    echo 'accept or reject friend request';
+    $this->required_login();
+    $action = $this->input->input_stream('action', true);
+    if (empty($action) || !in_array($action, array('accept', 'reject'))) {
+      return $this->error(400, 'Invalid action');
+    }
+    $current = $this->session->user;
+    $result = $this->users_model->handle_friend_request($uid, $current['uid'], $action);
+    if (!empty($result['error'])) {
+      $this->error(400, $result['error']);
+    } else {
+      $this->json($result['user']);
+    }
   }
 }
 ?>
