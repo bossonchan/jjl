@@ -534,7 +534,7 @@ POST /friend_request
 }
 ```
 
-### Get friend requests (ignore paging temporarily)
+### Get friend requests
 
 GET /friend_request?`count`=10*`offset`=0
 
