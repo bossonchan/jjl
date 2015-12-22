@@ -10,5 +10,7 @@
 
 The [front-end project](http://kuangwk.github.io/neighbour/) should place in `public/`.
 
+Then you can access static files in `<site url>/public/xxx`.
+
 ## APIs
 See the [API Document](https://github.com/bossonchan/jjl/blob/master/api.md).
