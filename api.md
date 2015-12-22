@@ -536,7 +536,12 @@ POST /friend_request
 
 ### Get friend requests (ignore paging temporarily)
 
-GET /friend_request
+GET /friend_request?`count`=10*`offset`=0
+
+**params**
+
+- offset - optional, default 0
+- count  - optional, default 10, use -1 to get total items
 
 **status**
 
