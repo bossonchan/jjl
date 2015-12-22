@@ -160,13 +160,12 @@ GET /users/me
 
 ### Get hood list
 
-GET /hoods?`offset`=0&`count`=10&`sort`=-1
+GET /hoods?`offset`=0&`count`=10
 
 **params**
 
 - offset - optional, default 0
 - count  - optional, default 10, use -1 to get total items
-- sort   - optional, default -1, use 1 for descending and -1 for ascending
 
 **status**
 
@@ -199,7 +198,6 @@ GET /hoods/`:hood_id`/blocks?`offset`=0&`count`=10
 - hood_id
 - offset - optional, default 0
 - count  - optional, default 10, use -1 to get total items
-- sort   - optional, default -1, use 1 for descending and -1 for ascending
 
 **status**
 
@@ -251,13 +249,12 @@ POST /blocks/`:block_id`/apply
 
 ### Get members of block
 
-GET /blocks/`:block_id`/users?`offset`=0&`count`=10&`sort`=1
+GET /blocks/`:block_id`/users?`offset`=0&`count`=10
 
 **params**
 - block_id
 - offset - optional, default 0
 - count  - optional, default 10, use -1 to get total items
-- sort   - optional, default -1, use 1 for descending and -1 for ascending
 
 **status**
 ```
