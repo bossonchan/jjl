@@ -83,7 +83,7 @@ class Messages extends REST {
         'u_photo'   => $current['u_photo'],
         'address'   => $current['address'],
         'block_id'  => $current['block_id'],
-      )
+      );
       $this->json($result['message']);
     }
   }
