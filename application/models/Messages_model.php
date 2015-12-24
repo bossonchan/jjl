@@ -102,7 +102,7 @@ class Messages_model extends CI_Model {
 
     $detail_query = '
       select *
-      from messages as m
+      from messages as m, user as us
     ';
 
     $total_query  = '
@@ -112,19 +112,19 @@ class Messages_model extends CI_Model {
 
     $query_bindings = array();
     if ($type === 'private') {
-      $detail_query = $detail_query . ' where ' . $private_where;
+      $detail_query = $detail_query . ' where m.m_from = us.uid and (' . $private_where . ') ';
       $total_query  = $total_query  . ' where ' . $private_where;
       $query_bindings = array($uid);
     } else if ($type === 'friend') {
-      $detail_query = $detail_query . ' where ' . $friend_where;
+      $detail_query = $detail_query . ' where m.m_from = us.uid and (' . $friend_where . ') ';
       $total_query  = $total_query  . ' where ' . $friend_where;
       $query_bindings = array($uid, $uid);
     } else if ($type === 'neighbor') {
-      $detail_query = $detail_query . ' where ' . $neighbor_where;
+      $detail_query = $detail_query . ' where m.m_from = us.uid and (' . $neighbor_where . ') ';
       $total_query  = $total_query  . ' where ' . $neighbor_where;
       $query_bindings = array($uid);
     } else {
-      $detail_query = $detail_query . ' where ' . $all_where;
+      $detail_query = $detail_query . ' where m.m_from = us.uid and (' . $all_where . ') ';
       $total_query  = $total_query  . ' where ' . $all_where;
       $query_bindings = array($uid, $uid, $uid, $uid, $uid);
     }
@@ -140,6 +140,26 @@ class Messages_model extends CI_Model {
       array_push($query_bindings, $offset, $offset + $count);
     }
     $result = $this->db->query($detail_query, $query_bindings)->result_array();
+    $result = array_map(function ($item) {
+      return array(
+        'mid'       => $item['mid'],
+        'm_type'    => $item['m_type'],
+        'm_hood'    => $item['m_hood'],
+        'm_title'   => $item['m_title'],
+        'm_content' => $item['m_content'],
+        'm_time'    => $item['m_time'],
+        'm_to'      => $item['m_to'],
+        'm_from'    => array(
+          'uid'       => $item['uid'],
+          'u_name'    => $item['u_name'],
+          'u_gender'  => $item['u_gender'],
+          'u_profile' => $item['u_profile'],
+          'u_photo'   => $item['u_photo'],
+          'address'   => $item['address'],
+          'block_id'  => $item['block_id'],
+        )
+      );
+    }, $result);
 
     return array(
       'type'       => $type,
