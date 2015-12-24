@@ -60,10 +60,20 @@ function renderHoods() {
 }
 
 function renderMessages() {
-    var html_messages = template('messages', {
-        messages: MOCKS.messages
-    });
-    $('#main').html(html_messages);
+    $.ajax({
+        url: BaseUrl + '/messages',
+        type: 'get',
+        data: {
+            type: 'all',
+        },
+        success: function(data) {
+            var messages = data.messages;
+            var html_messages = template('messages', {
+                messages: messages
+            });
+            $('#main').html(html_messages);
+        }
+    })
     location.hash = '#messages';
     setTabActive(1);
 }
