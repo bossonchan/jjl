@@ -447,6 +447,57 @@ POST /messages
 }
 ```
 
+### Searching messages
+
+GET /messages/search?`key`=xxx
+
+**params**
+
+- key
+
+**status**
+
+- 400
+- 200
+```
+{
+  "messages": [
+    {
+      "mid"      : 123123123,
+      "m_type"   : "private",
+
+      "m_title"  : "abcd",
+      "m_content": "alsjflkasdjflasdfj",
+      "m_time"   : "2015-12-12 21:00:00",
+
+      "m_from"   : {
+        "uid"       : 123123,
+        "u_name"    : "xxx",
+
+        "u_profile" : "",
+        "u_photo"   : "/avatar.png",
+        "u_gender"  : "M",
+
+        "address"   : "",
+        "lastVisit" : "2015-10-11 21:00:00"
+      },
+      "m_to"     : {
+        "uid"       : 123123,
+        "u_name"    : "xxx",
+
+        "u_profile" : "",
+        "u_photo"   : "/avatar.png",
+        "u_gender"  : "M",
+
+        "address"   : "",
+        "lastVisit" : "2015-10-11 21:00:00"
+      },
+      "m_hood"   : 123123
+    }
+  ]
+}
+```
+
 ## Friends
 
 ### Get friend list
