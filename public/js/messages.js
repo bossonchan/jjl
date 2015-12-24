@@ -1,16 +1,14 @@
 (function() {
     function activeMessageTab(type) {
         $('ul.nav-pills').find('.active').removeClass('active');
-        $('ul.nav-pills').find('li').eq(type).addClass('active');
+        $('ul.nav-pills').find("[data-type='"+type+"']").parent().addClass('active');
     }
 
     $('.js-msg-type').on('click', function(e) {
         var type = $(this).find('a').data('type');
-        $(this).parent().find('.active').removeClass('active');
-        $(this).addClass('active');
         $.ajax({
-            url: '/get_messages',
-            type: 'POST',
+            url: BaseUrl + '/messages',
+            type: 'get',
             data: {
                 type: type,
             },

@@ -1,18 +1,41 @@
 <h1>Messages</h1>
 type: 
 <ul class="nav nav-pills">
-  <li role="presentation" class="js-msg-type active"><a href="javascript:void(0)" class="" data-type='0'>all</a></li>
-  <li role="presentation" class="js-msg-type"><a href="javascript:void(0)" class="" data-type='1'>private</a></li>
-  <li role="presentation" class="js-msg-type"><a href="javascript:void(0)" class="" data-type='2'>friend</a></li>
-  <li role="presentation" class="js-msg-type"><a href="javascript:void(0)" class="" data-type='3'>block</a></li>
+  <li role="presentation" class="js-msg-type active"><a href="javascript:void(0)" class="" data-type='all'>all</a></li>
+  <li role="presentation" class="js-msg-type"><a href="javascript:void(0)" class="" data-type='private'>private</a></li>
+  <li role="presentation" class="js-msg-type"><a href="javascript:void(0)" class="" data-type='friend'>friend</a></li>
+  <li role="presentation" class="js-msg-type"><a href="javascript:void(0)" class="" data-type='neighbor'>neighbor</a></li>
 </ul>
-<ul>
-{{each messages}}
+<table class='table'>
+    <thead>
+        <tr>
+            <th>title</th>
+            <th>content</th>
+            <th>from</th>
+            <th>type</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{each messages}}
+        <tr>
+            <th>{{$value.m_title}}</th>
+            <th>{{$value.m_content}}</th>
+            <th>{{$value.m_from.u_name}}</th>
+            <th>{{$value.m_type}}</th>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+<!-- <ul>
+<!-- {{each messages}}
   <li>
-    <a href='javascript:void(0)' data-id="{{$value.id}}">{{$value.title}}</a>
-    <p>{{$value.content}}</p>
-    <p>{{$value.from}}</p>
+    <p>title:{{$value.m_title}}</p>
+    <p>content: {{$value.m_content}}</p>
+    <p>from: {{$value.m_from}}</p>
+    <p>type: {{$value.m_type}}</p>
   </li>
 {{/each}}
+
+ -->
+<!-- </ul> -->
 <script src='./js/messages.js'></script>
-</ul>

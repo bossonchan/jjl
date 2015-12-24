@@ -1,23 +1,24 @@
 <form class="form-signin">
-  <h2 class="form-signin-heading">Post a message</h2>
+  <h2 class="form-signin-heading">Post message</h2>
   <label for="inputTitle" class="sr-only">Title</label>
   <input name="title" type="text" id="inputTitle" class="form-control" placeholder="Title" required="" autofocus="true">
-  <textarea class="form-control" name="content" id="" cols="30" rows="10"></textarea>
+  <textarea class="form-control" id="inputContent" name="content" id="" cols="30" rows="10"></textarea>
   <div class="radio">
   type: <br/>
     <label>
-      <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
-      area
+      <input type="radio" name="optionsRadios" id="optionsRadios1" value="neighbor" checked>
+      blocks 
     </label>
     <label>
-      <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+      <input type="radio" name="optionsRadios" id="optionsRadios2" value="friend">
       frineds
     </label>
     <label>
-      <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">
+      <input type="radio" name="optionsRadios" id="optionsRadios3" value="private">
       private
-      <input type="text" placeholder='private to whom' name="friend_name">
+      <input type="text" id="inputFriend" placeholder='private to whom' name="friend_name">
     </label>
-  <button class="btn btn-success btn-block" >post</button>
+  <button class="btn btn-success btn-block js-post" >post</button>
 </form>
+
 <script src='./js/post.js'></script>

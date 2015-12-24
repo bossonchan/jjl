@@ -1,0 +1,35 @@
+.cover {
+    position: fixed;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('../images/bg_dogwalk.jpg');
+    background-repeat: no-repeat;
+    background-size: 108% 100%;
+    margin-left: -4%;
+}
+h1, h2{
+    color: #fff;
+}
+
+.container {
+    text-align: center;
+}
+
+.dropdown {
+    float: left;
+}
+
+input {
+}
+
+.btn-block {
+    clear: both;
+    margin: 5px 0;
+}
+
+.form-signin {
+    margin-top: 50px;
+}
