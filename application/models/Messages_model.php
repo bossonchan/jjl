@@ -108,7 +108,7 @@ class Messages_model extends CI_Model {
     ';
 
     $detail_query = '
-      select *
+      select distinct *
       from messages as m, user as us
     ';
 
@@ -175,6 +175,96 @@ class Messages_model extends CI_Model {
       'offset'     => $count > 0 ? $offset : 0,
       'nextOffset' => $count > 0 ? $offset + $count : -1,
       'messages'   => $result
+    );
+  }
+
+  public function search($uid, $keyword) {
+    // sent by myself
+    $mine_where = '
+      m.m_from = ?
+    ';
+
+    // sent to me
+    $private_where = '
+      m.m_type = \'private\'
+      and (
+        ' . $mine_where. '
+        or
+        m.m_to = ?
+      )
+    ';
+
+    // sent from friends
+    $friend_where   = '
+      m.m_type = \'friend\'
+      and (
+        ' . $mine_where . '
+        or
+        m.m_from in (
+          select f.uid1 as uid
+          from friends as f
+          where f.uid2 = ? and (f.state = \'active\' or f.state = \'accepted\')
+          union
+          select f.uid2 as uid
+          from friends as f
+          where f.uid1 = ? and (f.state = \'active\' or f.state = \'accepted\')
+        )
+      )
+    ';
+
+    // sent from following users
+    $neighbor_where = '
+      m.m_type = \'neighbor\'
+      and (
+        ' . $mine_where . '
+        or
+        m.m_from in (
+          select n.uid2
+          from neighbor as n
+          where n.uid1 = ?
+        )
+      )
+    ';
+
+    $all_where = '
+      (' . $private_where . ')
+      or
+      (' . $friend_where . ')
+      or
+      (' . $neighbor_where . ')
+    ';
+
+    $sql = '
+      select distinct  *
+      from messages as m, user as us
+      where m.m_from = us.uid and (m_content like ? and '. $all_where . ')
+    ';
+    $query_bindings = array($keyword, $uid, $uid, $uid, $uid, $uid, $uid, $uid);
+    $result = $this->db->query($sql, $query_bindings)->result_array();
+    $result = array_map(function ($item) {
+      return array(
+        'mid'       => $item['mid'],
+        'm_type'    => $item['m_type'],
+        'm_hood'    => $item['m_hood'],
+        'm_title'   => $item['m_title'],
+        'm_content' => $item['m_content'],
+        'm_time'    => $item['m_time'],
+        'm_to'      => $item['m_to'],
+        'm_from'    => array(
+          'uid'       => $item['uid'],
+          'u_name'    => $item['u_name'],
+          'u_gender'  => $item['u_gender'],
+          'u_profile' => $item['u_profile'],
+          'u_photo'   => $item['u_photo'],
+          'address'   => $item['address'],
+          'block_id'  => $item['block_id'],
+        )
+      );
+    }, $result);
+
+    return array(
+      'keyword' => $keyword,
+      'messages' => $result
     );
   }
 }

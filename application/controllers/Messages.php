@@ -87,5 +87,20 @@ class Messages extends REST {
       $this->json($result['message']);
     }
   }
+
+  public function get_search() {
+    $keyword = $this->input->get('keyword', true);
+    if (empty($keyword)) {
+      return $this->error(400, 'invalid keyword');
+    }
+
+    $uid = -1; // never exist
+    if ($this->session->has_userdata('user')) {
+      $current = $this->session->userdata('user');
+      $uid = $current['uid'];
+    }
+    $result = $this->messages_model->search($uid, $keyword);
+    $this->json($result);
+  }
 }
 ?>

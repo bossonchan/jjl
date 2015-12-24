@@ -449,11 +449,11 @@ POST /messages
 
 ### Searching messages
 
-GET /messages/search?`key`=xxx
+GET /messages/search?`keyword`=xxx
 
 **params**
 
-- key
+- keyword
 
 **status**
 
@@ -461,6 +461,7 @@ GET /messages/search?`key`=xxx
 - 200
 ```
 {
+  "keyword": "xxx",
   "messages": [
     {
       "mid"      : 123123123,
