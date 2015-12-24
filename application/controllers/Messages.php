@@ -12,7 +12,32 @@ class Messages extends REST {
   }
 
   public function get_messages() {
-    echo 'get message list';
+    $type  = $this->input->get('type', true);
+    $count = intval($this->input->get('count', true));
+    $offset= intval($this->input->get('offset', true));
+    $sort  = intval($this->input->get('sort', true));
+
+    $type   = empty($type)   ? 'all' : $type;
+    $count  = empty($count)  ? 10 : $count;
+    $offset = empty($offset) ? 0  : $offset;
+    $sort   = empty($sort)   ? -1 : $sort;
+
+    if (!in_array($type, array('all', 'friend', 'private', 'neighbor'))) {
+      return $this->error(400, 'invalid type');
+    }
+
+    if (is_nan($count) || is_nan($offset)) {
+      return $this->error(400, 'Invalid offset or count or sort.');
+    }
+
+    $uid = -1; // never exist
+    if ($this->session->has_userdata('user')) {
+      $current = $this->session->userdata('user');
+      $uid = $current['uid'];
+    }
+
+    $result = $this->messages_model->get_message_list($uid, $type, $count, $offset, $sort);
+    $this->json($result);
   }
 
   public function post_messages() {
