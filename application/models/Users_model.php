@@ -104,18 +104,34 @@ class Users_model extends CI_Model {
   }
 
   public function get_friend_list($uid, $count, $offset) {
-    $from  = ' from user as u ';
-    $query = ' where u.uid in (select uid1 from friends where uid2 = ' . $uid . ' and (state = \'active\' or state = \'accepted\') union select uid2 from friends where uid1 = ' . $uid . ' and (state = \'active\' or state = \'accepted\')) ';
 
-    $count_all = 'select COUNT(*) as total ' . $from . $query;
-    $result = $this->db->query($count_all)->row_array();
+    $count_all = '
+      select COUNT(*) as total
+      from user as u
+      where u.uid in (
+        select uid1 from friends where uid2 = ? and (state = \'active\' or state = \'accepted\')
+        union
+        select uid2 from friends where uid1 = ? and (state = \'active\' or state = \'accepted\')
+      )
+    ';
+
+    $get_friends = '
+      select ' . $this->__select . '
+      from user as u
+      where u.uid in (
+        select uid1 from friends where uid2 = ? and (state = \'active\' or state = \'accepted\')
+        union
+        select uid2 from friends where uid1 = ? and (state = \'active\' or state = \'accepted\')
+      )
+    ';
+
+    $result = $this->db->query($count_all, array($uid, $uid))->row_array();
     $total = empty($result) ? 0 : intval($result['total']);
 
-    $get_friends = 'select ' . $this->__select . $from . $query;
     if ($count > 0) {
       $get_friends = $get_friends . ' limit ' . $offset . ', ' . ($offset + $count) . ';';
     }
-    $friends = $this->db->query($get_friends)->result_array();
+    $friends = $this->db->query($get_friends, array($uid, $uid))->result_array();
 
     return array(
       'total'      => $total,
@@ -132,18 +148,28 @@ class Users_model extends CI_Model {
   }
 
   public function get_friend_requests($uid, $count, $offset) {
-    $from  = ' from user as u, friends as f ';
-    $query = ' where u.uid = ' . $uid . ' and u.uid = f.uid2 and f.state = \'pending\' ';
+    $count_all = '
+      select COUNT(*) as total
+      from user as u, friends as f
+      where u.uid = ? and u.uid = f.uid2 and f.state = \'pending\'
+    ';
 
-    $count_all = 'select COUNT(*) as total ' . $from . $query;
-    $result = $this->db->query($count_all)->row_array();
+    $get_requests = '
+      select ' . $this->__select . '
+      from user where uid in (
+        select f.uid1
+        from user as u, friends as f
+        where u.uid = ? and u.uid = f.uid2 and f.state = \'pending\'
+      )
+    ';
+
+    $result = $this->db->query($count_all, array($uid))->row_array();
     $total = empty($result) ? 0 : intval($result['total']);
 
-    $get_requests = 'select ' . $this->__select . ' from user where uid in (select f.uid1 ' . $from . $query . ')';
     if ($count > 0) {
       $get_requests = $get_requests . ' limit ' . $offset . ', ' . ($offset + $count) . ';';
     }
-    $requests = $this->db->query($get_requests)->result_array();
+    $requests = $this->db->query($get_requests, array($uid))->result_array();
 
     return array(
       'total'      => $total,
@@ -191,8 +217,12 @@ class Users_model extends CI_Model {
   public function handle_friend_request($sender, $receiver, $action) {
     $this->db->trans_start();
 
-    $sql = 'select ' . $this->__select . ' from user as u, friends as f where u.uid = f.uid1 and f.uid1 = ' . $sender . ' and f.uid2 = '. $receiver . ' and f.state = \'pending\'';
-    $request = $this->db->query($sql)->row_array();
+    $sql = '
+      select ' . $this->__select . '
+      from user as u, friends as f
+      where u.uid = f.uid1 and f.uid1 = ? and f.uid2 = ? and f.state = \'pending\'
+    ';
+    $request = $this->db->query($sql, array($sender, $receiver))->row_array();
 
     if (empty($request)) {
       $this->db->trans_complete();
