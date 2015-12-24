@@ -5,6 +5,61 @@ class Messages_model extends CI_Model {
   public function __construct() {
     parent::__construct();
     $this->load->database();
+    // sent by myself
+    $this->mine_where = '
+      m.m_from = ?
+    ';
+
+    // sent to me
+    $this->private_where = '
+      m.m_type = \'private\'
+      and (
+        ' . $this->mine_where. '
+        or
+        m.m_to = ?
+      )
+    ';
+
+    // sent from friends
+    $this->friend_where   = '
+      m.m_type = \'friend\'
+      and (
+        ' . $this->mine_where . '
+        or
+        m.m_from in (
+          select f.uid1 as uid
+          from friends as f
+          where f.uid2 = ? and (f.state = \'active\' or f.state = \'accepted\')
+          union
+          select f.uid2 as uid
+          from friends as f
+          where f.uid1 = ? and (f.state = \'active\' or f.state = \'accepted\')
+        )
+      )
+    ';
+
+    // sent from following users
+    $this->neighbor_where = '
+      m.m_type = \'neighbor\'
+      and (
+        ' . $this->mine_where . '
+        or
+        m.m_from in (
+          select n.uid2
+          from neighbor as n
+          where n.uid1 = ?
+        )
+      )
+    ';
+
+    $this->all_where = '
+      (' . $this->private_where . ')
+      or
+      (' . $this->friend_where . ')
+      or
+      (' . $this->neighbor_where . ')
+    ';
+
   }
 
   public function create_message($data) {
@@ -52,61 +107,6 @@ class Messages_model extends CI_Model {
   }
 
   public function get_message_list($uid, $type, $count, $offset, $sort) {
-    // sent by myself
-    $mine_where = '
-      m.m_from = ?
-    ';
-
-    // sent to me
-    $private_where = '
-      m.m_type = \'private\'
-      and (
-        ' . $mine_where. '
-        or
-        m.m_to = ?
-      )
-    ';
-
-    // sent from friends
-    $friend_where   = '
-      m.m_type = \'friend\'
-      and (
-        ' . $mine_where . '
-        or
-        m.m_from in (
-          select f.uid1 as uid
-          from friends as f
-          where f.uid2 = ? and (f.state = \'active\' or f.state = \'accepted\')
-          union
-          select f.uid2 as uid
-          from friends as f
-          where f.uid1 = ? and (f.state = \'active\' or f.state = \'accepted\')
-        )
-      )
-    ';
-
-    // sent from following users
-    $neighbor_where = '
-      m.m_type = \'neighbor\'
-      and (
-        ' . $mine_where . '
-        or
-        m.m_from in (
-          select n.uid2
-          from neighbor as n
-          where n.uid1 = ?
-        )
-      )
-    ';
-
-    $all_where = '
-      (' . $private_where . ')
-      or
-      (' . $friend_where . ')
-      or
-      (' . $neighbor_where . ')
-    ';
-
     $detail_query = '
       select distinct *
       from messages as m, user as us
@@ -119,20 +119,20 @@ class Messages_model extends CI_Model {
 
     $query_bindings = array();
     if ($type === 'private') {
-      $detail_query = $detail_query . ' where m.m_from = us.uid and (' . $private_where . ') ';
-      $total_query  = $total_query  . ' where ' . $private_where;
+      $detail_query = $detail_query . ' where m.m_from = us.uid and (' . $this->private_where . ') ';
+      $total_query  = $total_query  . ' where ' . $this->private_where;
       $query_bindings = array($uid, $uid);
     } else if ($type === 'friend') {
-      $detail_query = $detail_query . ' where m.m_from = us.uid and (' . $friend_where . ') ';
-      $total_query  = $total_query  . ' where ' . $friend_where;
+      $detail_query = $detail_query . ' where m.m_from = us.uid and (' . $this->friend_where . ') ';
+      $total_query  = $total_query  . ' where ' . $this->friend_where;
       $query_bindings = array($uid, $uid, $uid);
     } else if ($type === 'neighbor') {
-      $detail_query = $detail_query . ' where m.m_from = us.uid and (' . $neighbor_where . ') ';
-      $total_query  = $total_query  . ' where ' . $neighbor_where;
+      $detail_query = $detail_query . ' where m.m_from = us.uid and (' . $this->neighbor_where . ') ';
+      $total_query  = $total_query  . ' where ' . $this->neighbor_where;
       $query_bindings = array($uid, $uid);
     } else {
-      $detail_query = $detail_query . ' where m.m_from = us.uid and (' . $all_where . ') ';
-      $total_query  = $total_query  . ' where ' . $all_where;
+      $detail_query = $detail_query . ' where m.m_from = us.uid and (' . $this->all_where . ') ';
+      $total_query  = $total_query  . ' where ' . $this->all_where;
       $query_bindings = array($uid, $uid, $uid, $uid, $uid, $uid, $uid);
     }
 
@@ -179,65 +179,10 @@ class Messages_model extends CI_Model {
   }
 
   public function search($uid, $keyword) {
-    // sent by myself
-    $mine_where = '
-      m.m_from = ?
-    ';
-
-    // sent to me
-    $private_where = '
-      m.m_type = \'private\'
-      and (
-        ' . $mine_where. '
-        or
-        m.m_to = ?
-      )
-    ';
-
-    // sent from friends
-    $friend_where   = '
-      m.m_type = \'friend\'
-      and (
-        ' . $mine_where . '
-        or
-        m.m_from in (
-          select f.uid1 as uid
-          from friends as f
-          where f.uid2 = ? and (f.state = \'active\' or f.state = \'accepted\')
-          union
-          select f.uid2 as uid
-          from friends as f
-          where f.uid1 = ? and (f.state = \'active\' or f.state = \'accepted\')
-        )
-      )
-    ';
-
-    // sent from following users
-    $neighbor_where = '
-      m.m_type = \'neighbor\'
-      and (
-        ' . $mine_where . '
-        or
-        m.m_from in (
-          select n.uid2
-          from neighbor as n
-          where n.uid1 = ?
-        )
-      )
-    ';
-
-    $all_where = '
-      (' . $private_where . ')
-      or
-      (' . $friend_where . ')
-      or
-      (' . $neighbor_where . ')
-    ';
-
     $sql = '
       select distinct  *
       from messages as m, user as us
-      where m.m_from = us.uid and (m_content like ? and '. $all_where . ')
+      where m.m_from = us.uid and (m_content like ? and '. $this->all_where . ')
     ';
     $query_bindings = array($keyword, $uid, $uid, $uid, $uid, $uid, $uid, $uid);
     $result = $this->db->query($sql, $query_bindings)->result_array();
