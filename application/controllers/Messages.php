@@ -70,10 +70,6 @@ class Messages extends REST {
       return $this->error(400, 'm_to cannot miss when m_type is private');
     }
 
-    if ($data['m_to'] === $current['uid']) {
-      return $this->error(400, 'cannot send private message to yourself');
-    }
-
     $data['m_from'] = $current['uid'];
     $result = $this->messages_model->create_message($data);
     if (!empty($result['error'])) {

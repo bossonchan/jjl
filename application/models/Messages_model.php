@@ -23,11 +23,13 @@ class Messages_model extends CI_Model {
       $this->db->select('uid, u_name, u_gender, u_profile, u_photo, address, block_id');
       $this->db->from('user');
       $this->db->where('uid', $data['m_to']);
+      $this->db->or_where('u_name', $data['m_to']);
       $to = $this->db->get()->row_array();
       if (empty($to)) {
         $this->db->trans_complete();
         return array('error' => 'cannot find m_to user');
       }
+      $data['m_to'] = $to['uid'];
     } else {
       unset($data['m_to']);
     }
