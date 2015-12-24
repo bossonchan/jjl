@@ -85,7 +85,7 @@ class Users extends REST {
   public function post_follow($uid) {
     $this->required_login();
     $current = $this->session->userdata('user');
-    if ($uid === $current['uid']) {
+    if ($uid == $current['uid']) {
       return $this->error(400, 'cannot follow yourself.');
     }
     $result  = $this->users_model->follow($current['uid'], $uid);
