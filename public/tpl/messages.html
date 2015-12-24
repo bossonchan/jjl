@@ -1,0 +1,18 @@
+<h1>Messages</h1>
+type: 
+<ul class="nav nav-pills">
+  <li role="presentation" class="js-msg-type active"><a href="javascript:void(0)" class="" data-type='0'>all</a></li>
+  <li role="presentation" class="js-msg-type"><a href="javascript:void(0)" class="" data-type='1'>private</a></li>
+  <li role="presentation" class="js-msg-type"><a href="javascript:void(0)" class="" data-type='2'>friend</a></li>
+  <li role="presentation" class="js-msg-type"><a href="javascript:void(0)" class="" data-type='3'>block</a></li>
+</ul>
+<ul>
+{{each messages}}
+  <li>
+    <a href='javascript:void(0)' data-id="{{$value.id}}">{{$value.title}}</a>
+    <p>{{$value.content}}</p>
+    <p>{{$value.from}}</p>
+  </li>
+{{/each}}
+<script src='./js/messages.js'></script>
+</ul>

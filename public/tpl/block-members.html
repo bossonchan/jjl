@@ -1,0 +1,15 @@
+<h1>members of {{block}}</h1>
+<ul>
+{{each members}}
+  <li>
+    <span href='javascript:void(0)' data-id="{{$value.uid}}">{{$value.u_name}}</span>
+    {{if $value.follow}}
+    <button class='btn btn-xs btn-primary js-follow' data-id="{{$value.uid}}" disabled="disabled">follow</button>
+    {{else}}
+    <button class='btn btn-xs btn-primary js-follow' data-id="{{$value.uid}}">follow</button>
+    {{/if}}
+  </li>
+{{/each}}
+</ul> 
+<button class="btn btn-s btn-week js-back-hoods">back</button>
+<script src='./js/hoods.js'></script>

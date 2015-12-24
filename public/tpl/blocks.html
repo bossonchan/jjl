@@ -1,0 +1,15 @@
+<h1>blocks</h1>
+<ul>
+{{if blocks.length}}
+{{each blocks}}
+  <li class='js-blocks'>
+    <span class="b_name" data-id="{{$value.block_id}}">{{$value.b_name}}</span>
+    <button class='btn btn-xs btn-primary js-join-block' data-id="{{$value.block_id}}">join</button>
+  </li>
+{{/each}}
+{{else}}
+    <h2>no blocks</h2>
+{{/if}}
+</ul> 
+<button class="btn btn-s btn-week js-back-hoods">back</button>
+<script src='./js/hoods.js'></script>
