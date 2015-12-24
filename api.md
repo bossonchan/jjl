@@ -343,7 +343,7 @@ GET /messages?`offset`=0&`count`=10&`sort`=1&`type`=all
 
 **params**
 
-- type   - enum(all, private, friends, blocks)
+- type   - enum(all, private, friend, neighbor)
 - offset - optional, default 0
 - count  - optional, default 10, use -1 to get total items
 - sort   - optional, default -1, use 1 for descending and -1 for ascending
@@ -402,7 +402,7 @@ POST /messages
 
 **params**
 
-- m_type
+- m_type - enum(private, neighbor, friend)
 - m_title
 - m_content
 - m_to
