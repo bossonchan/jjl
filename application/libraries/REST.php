@@ -10,24 +10,21 @@ abstract class REST extends CI_Controller {
   }
 
   public function login_conflict_check() {
-    $user = $this->session->userdata('user');
-    if (!empty($user)) {
+    if ($this->session->has_userdata('user')) {
        $this->error(409, 'Current user has been logged in');
        exit();
     }
   }
 
   public function logout_conflict_check() {
-    $user = $this->session->userdata('user');
-    if (empty($user)) {
+    if (!$this->session->has_userdata('user')) {
       $this->error(409, 'Current user not logged in');
       exit();
     }
   }
 
   public function required_login() {
-    $user = $this->session->userdata('user');
-    if (empty($user)) {
+    if (!$this->session->has_userdata('user')) {
       $this->error(401, 'You should login first');
       exit();
     }

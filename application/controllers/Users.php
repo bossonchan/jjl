@@ -25,14 +25,14 @@ class Users extends REST {
     if ($result['error']) {
       $this->error(401, $result['error']);
     } else {
-      $this->session->user = $result['user'];
+      $this->session->set_userdata(array('user' => $result['user']));
       $this->json($result['user']);
     }
   }
 
   public function delete_session(){
     $this->logout_conflict_check();
-    $this->session->user = null;
+    $this->session->unset_userdata('user');
     $this->json((object)null);
   }
 
@@ -47,7 +47,7 @@ class Users extends REST {
 
   public function get_current() {
     $this->required_login();
-    $this->json($this->session->user);
+    $this->json($this->session->userdata('user'));
   }
 
   public function post_users() {
@@ -77,14 +77,14 @@ class Users extends REST {
     if (!empty($result['error'])) {
       $this->error(400, $result['error']);
     } else {
-      $this->session->user = $result['user'];
+      $this->session->set_userdata(array('user' => $result['user']));
       $this->json($result['user']);
     }
   }
 
   public function post_follow($uid) {
     $this->required_login();
-    $current = $this->session->user;
+    $current = $this->session->userdata('user');
     if ($uid === $current['uid']) {
       return $this->error(400, 'cannot follow yourself.');
     }
@@ -92,14 +92,13 @@ class Users extends REST {
     if (!empty($result['error'])) {
       $this->error(400, $result['error']);
     } else {
-      $this->session->user = $result['user'];
       $this->json($result['user']);
     }
   }
 
   public function delete_follow($uid) {
     $this->required_login();
-    $current = $this->session->user;
+    $current = $this->session->userdata('user');
     $this->users_model->unfollow($current['uid'], $uid);
     $this->json((object)(null));
   }
@@ -107,7 +106,7 @@ class Users extends REST {
   public function get_friend_list() {
     $this->required_login();
 
-    $current = $this->session->user;
+    $current = $this->session->userdata('user');
 
     $count = intval($this->input->get('count', true));
     $offset= intval($this->input->get('offset', true));
@@ -125,7 +124,7 @@ class Users extends REST {
 
   public function delete_friend($uid) {
     $this->required_login();
-    $current = $this->session->user;
+    $current = $this->session->userdata('user');
     $this->users_model->remove_friends($current['uid'], $uid);
     $this->json((object)null);
   }
@@ -143,7 +142,7 @@ class Users extends REST {
       return $this->error(400, 'Invalid offset or count.');
     }
 
-    $current = $this->session->user;
+    $current = $this->session->userdata('user');
     $result = $this->users_model->get_friend_requests($current['uid'], $count, $offset);
     $this->json($result);
   }
@@ -154,7 +153,7 @@ class Users extends REST {
     if (empty($username)) {
       return $this->error(400, 'Empty u_name');
     }
-    $current = $this->session->user;
+    $current = $this->session->userdata('user');
     $result = $this->users_model->send_friend_request($current['uid'], $username);
     if (!empty($result['error'])) {
       $this->error(400, $result['error']);
@@ -169,7 +168,7 @@ class Users extends REST {
     if (empty($action) || !in_array($action, array('accept', 'reject'))) {
       return $this->error(400, 'Invalid action');
     }
-    $current = $this->session->user;
+    $current = $this->session->userdata('user');
     $result = $this->users_model->handle_friend_request($uid, $current['uid'], $action);
     if (!empty($result['error'])) {
       $this->error(400, $result['error']);
