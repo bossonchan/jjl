@@ -104,14 +104,14 @@ class Users_model extends CI_Model {
   }
 
   public function get_friend_list($uid, $count, $offset) {
-    $from  = ' from user as u, friends as f ';
-    $query = ' where u.uid = ' . $uid . ' and (u.uid = f.uid1 or u.uid = f.uid2) and (f.state = \'active\' or f.state = \'accepted\') ';
+    $from  = ' from user as u ';
+    $query = ' where u.uid in (select uid1 from friends where uid2 = ' . $uid . ' and (state = \'active\' or state = \'accepted\') union select uid2 from friends where uid1 = ' . $uid . ' and (state = \'active\' or state = \'accepted\')) ';
 
     $count_all = 'select COUNT(*) as total ' . $from . $query;
     $result = $this->db->query($count_all)->row_array();
     $total = empty($result) ? 0 : intval($result['total']);
 
-    $get_friends = 'select ' . $this->__select . ' from user where uid in (select f.uid2 ' . $from . $query . ')';
+    $get_friends = 'select ' . $this->__select . $from . $query;
     if ($count > 0) {
       $get_friends = $get_friends . ' limit ' . $offset . ', ' . ($offset + $count) . ';';
     }
