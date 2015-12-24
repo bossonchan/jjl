@@ -75,6 +75,15 @@ class Messages extends REST {
     if (!empty($result['error'])) {
       $this->error(400, $result['error']);
     } else {
+      $data['m_from'] = array(
+        'uid'       => $current['uid'],
+        'u_name'    => $current['u_name'],
+        'u_gender'  => $current['u_gender'],
+        'u_profile' => $current['u_profile'],
+        'u_photo'   => $current['u_photo'],
+        'address'   => $current['address'],
+        'block_id'  => $current['block_id'],
+      )
       $this->json($result['message']);
     }
   }
