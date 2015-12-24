@@ -60,39 +60,46 @@ class Messages_model extends CI_Model {
     // sent to me
     $private_where = '
       m.m_type = \'private\'
-      and
-      m.m_to = ?
+      and (
+        ' . $mine_where. '
+        or
+        m.m_to = ?
+      )
     ';
 
     // sent from friends
     $friend_where   = '
       m.m_type = \'friend\'
-      and
-      m.m_from in (
-        select f.uid1 as uid
-        from friends as f
-        where f.uid2 = ? and (f.state = \'active\' or f.state = \'accepted\')
-        union
-        select f.uid2 as uid
-        from friends as f
-        where f.uid1 = ? and (f.state = \'active\' or f.state = \'accepted\')
+      and (
+        ' . $mine_where . '
+        or
+        m.m_from in (
+          select f.uid1 as uid
+          from friends as f
+          where f.uid2 = ? and (f.state = \'active\' or f.state = \'accepted\')
+          union
+          select f.uid2 as uid
+          from friends as f
+          where f.uid1 = ? and (f.state = \'active\' or f.state = \'accepted\')
+        )
       )
     ';
 
     // sent from following users
     $neighbor_where = '
       m.m_type = \'neighbor\'
-      and
-      m.m_from in (
-        select n.uid2
-        from neighbor as n
-        where n.uid1 = ?
+      and (
+        ' . $mine_where . '
+        or
+        m.m_from in (
+          select n.uid2
+          from neighbor as n
+          where n.uid1 = ?
+        )
       )
     ';
 
     $all_where = '
-      (' . $mine_where . ')
-      or
       (' . $private_where . ')
       or
       (' . $friend_where . ')
@@ -114,19 +121,19 @@ class Messages_model extends CI_Model {
     if ($type === 'private') {
       $detail_query = $detail_query . ' where m.m_from = us.uid and (' . $private_where . ') ';
       $total_query  = $total_query  . ' where ' . $private_where;
-      $query_bindings = array($uid);
+      $query_bindings = array($uid, $uid);
     } else if ($type === 'friend') {
       $detail_query = $detail_query . ' where m.m_from = us.uid and (' . $friend_where . ') ';
       $total_query  = $total_query  . ' where ' . $friend_where;
-      $query_bindings = array($uid, $uid);
+      $query_bindings = array($uid, $uid, $uid);
     } else if ($type === 'neighbor') {
       $detail_query = $detail_query . ' where m.m_from = us.uid and (' . $neighbor_where . ') ';
       $total_query  = $total_query  . ' where ' . $neighbor_where;
-      $query_bindings = array($uid);
+      $query_bindings = array($uid, $uid);
     } else {
       $detail_query = $detail_query . ' where m.m_from = us.uid and (' . $all_where . ') ';
       $total_query  = $total_query  . ' where ' . $all_where;
-      $query_bindings = array($uid, $uid, $uid, $uid, $uid);
+      $query_bindings = array($uid, $uid, $uid, $uid, $uid, $uid, $uid);
     }
 
     // get total count of messages
