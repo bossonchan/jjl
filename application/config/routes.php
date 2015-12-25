@@ -66,8 +66,10 @@ $route['hoods/(:any)/blocks'] = 'hoods/block_list/$1';
 $route['blocks/(:any)/users'] = 'blocks/members/$1';
 $route['blocks/(:any)/apply'] = 'blocks/apply/$1';
 
-$route['messages/search'] = 'messages/search';
-$route['messages']        = 'messages/messages';
+$route['messages/search']          = 'messages/search';
+$route['messages/(:any)/comments'] = 'messages/comments/$1';
+$route['messages']                 = 'messages/messages';
+
 
 $route['default_controller'] = 'welcome';
 $route['404_override'] = '';

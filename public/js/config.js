@@ -1,3 +1,3 @@
 (function() {
-    window.BaseUrl = 'http://localhost/jjl/index.php';
+    window.BaseUrl = 'http://localhost/~Shin/jjl/index.php';
 })();

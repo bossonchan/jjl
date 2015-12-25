@@ -499,6 +499,78 @@ GET /messages/search?`keyword`=xxx
 }
 ```
 
+## Create comment for a message
+
+POST /messages/`:message_id`/comments
+
+**params**
+
+- message_id
+
+**status**
+
+- 401, 404
+- 200 
+```
+{
+  "cid": 1
+  "c_content": "xxx",
+  "c_time": "2015-12-12 12:12:12",
+  "c_from": {
+      "uid"       : 123123,
+      "u_name"    : "xxx",
+
+      "u_profile" : "",
+      "u_photo"   : "/avatar.png",
+      "u_gender"  : "M",
+
+      "address"   : "",
+      "lastVisit" : "2015-10-11 21:00:00"
+  }
+}
+```
+
+## Get comment list
+
+GET /messages/`:message_id`/comments?`offset`=0&`count`=10
+
+**params**
+
+- message_id
+- offset
+- count
+
+**status**
+
+- 400, 404
+- 200
+```
+{
+  "total": 10,
+  "offset": 0,
+  "count": 1,
+  "nextOffset": 1,
+  "comments": [
+    {
+      "cid": 1
+      "c_content": "xxx",
+      "c_time": "2015-12-12 12:12:12",
+      "c_from": {
+          "uid"       : 123123,
+          "u_name"    : "xxx",
+
+          "u_profile" : "",
+          "u_photo"   : "/avatar.png",
+          "u_gender"  : "M",
+
+          "address"   : "",
+          "lastVisit" : "2015-10-11 21:00:00"
+      }
+    }
+  ]
+
+}
+```
 ## Friends
 
 ### Get friend list

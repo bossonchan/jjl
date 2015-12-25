@@ -91,14 +91,14 @@ CREATE TABLE Comments(
   mid integer,
 
   c_from integer,
-  c_to   integer,
+  /*c_to   integer,*/
 
-  c_time datetime,
+  c_time datetime default now(),
   c_content varchar(100) not null,
 
   primary key(cid),
   foreign key(c_from) references User(uid),
-  foreign key(c_to) references User(uid),
+  /*foreign key(c_to) references User(uid),*/
   foreign key(mid) references Messages(mid)
 );
 

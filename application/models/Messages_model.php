@@ -212,5 +212,90 @@ class Messages_model extends CI_Model {
       'messages' => $result
     );
   }
+
+  public function create_comments($data) {
+    $this->db->trans_start();
+
+    $this->db->from('messages');
+    $this->db->where('mid', $data['mid']);
+    $message = $this->db->get()->row_array();
+    if (empty($message)) {
+      $this->db->trans_complete();
+      return array('error' => 'cannot find message');
+    }
+
+    $this->db->insert('comments', $data);
+    if ($this->db->affected_rows() === 0 ) {
+      $this->db->trans_complete();
+      return array('error' => 'insert failed for unknown reason');
+    }
+
+    $this->db->trans_complete();
+    if ($this->db->trans_status() === false) {
+      return array('error' => $this->db->error());
+    } else {
+      $data['message'] = $message;
+      return array('comment' => $data);
+    }
+  }
+
+  public function get_comment_list($message_id, $count, $offset) {
+    $detail_query = '
+      select *
+      from comments as c, messages as m, user as u
+      where c.mid = ? and c.mid = m.mid and c.c_from = u.uid
+      order by c.c_time
+    ';
+
+    $count_all_query = '
+      select count(*) as total
+      from comments as c
+      where c.mid = ?
+    ';
+
+    $query_bindings = array($message_id);
+    $total = $this->db->query($count_all_query, $query_bindings)->row_array();
+    $total = empty($total) ? 0 : intval($total['total']);
+
+    if ($count > 0) {
+      $detail_query = $detail_query . ' limit ?, ?';
+      array_push($query_bindings, $offset, $count + $offset);
+    }
+
+    $result = $this->db->query($detail_query, $query_bindings)->result_array();
+    $result = array_map(function($item) {
+      return array(
+        'cid'       => $item['cid'],
+        'c_time'    => $item['c_time'],
+        'c_content' => $item['c_content'],
+        'c_from' => array(
+          'uid'       => $item['uid'],
+          'u_name'    => $item['u_name'],
+          'u_gender'  => $item['u_gender'],
+          'u_profile' => $item['u_profile'],
+          'u_photo'   => $item['u_photo'],
+          'address'   => $item['address'],
+          'block_id'  => $item['block_id'],
+        ),
+        'message' => array(
+          'mid'       => $item['mid'],
+          'm_type'    => $item['m_type'],
+          'm_hood'    => $item['m_hood'],
+          'm_title'   => $item['m_title'],
+          'm_content' => $item['m_content'],
+          'm_time'    => $item['m_time'],
+          'm_to'      => $item['m_to'],
+        )
+      );
+    }, $result);
+
+    return array(
+      'total'      => $total,
+      'count'      => count($result),
+      'offset'     => $count > 0 ? $offset : 0,
+      'nextOffset' => $count > 0 ? $offset + $count : -1,
+      'comments'   => $result
+    );
+  }
 }
 ?>

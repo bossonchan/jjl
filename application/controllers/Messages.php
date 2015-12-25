@@ -102,5 +102,50 @@ class Messages extends REST {
     $result = $this->messages_model->search($uid, $keyword);
     $this->json($result);
   }
+
+  public function post_comments($message_id) {
+    $this->required_login();
+    
+    $current = $this->session->userdata('user');
+    $data = array(
+      'c_from'    => $current['uid'],
+      'c_content' => $this->input->post('c_content', true),
+      'mid'       => $message_id
+    );
+
+    if (empty($data['c_content'])) {
+      return $this->error(400, 'invlaid c_content');
+    }
+    $result = $this->messages_model->create_comments($data);
+    if (!empty($result['error'])) {
+      $this->error(400, $result['error']);
+    } else {
+      $result['comment']['c_from'] = array(
+        'uid'       => $current['uid'],
+        'u_name'    => $current['u_name'],
+        'u_gender'  => $current['u_gender'],
+        'u_profile' => $current['u_profile'],
+        'u_photo'   => $current['u_photo'],
+        'address'   => $current['address'],
+        'block_id'  => $current['block_id'],
+      );
+      $this->json($result['comment']);
+    }
+  }
+
+  public function get_comments($message_id) {
+    $count = intval($this->input->get('count', true));
+    $offset= intval($this->input->get('offset', true));
+
+    $count  = empty($count)  ? 10 : $count;
+    $offset = empty($offset) ? 0  : $offset;
+
+    if (is_nan($count) || is_nan($offset)) {
+      return $this->error(400, 'Invalid offset or count or sort.');
+    }
+
+    $result = $this->messages_model->get_comment_list($message_id, $count, $offset);
+    $this->json($result);
+  }
 }
 ?>
